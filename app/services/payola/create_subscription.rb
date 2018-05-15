@@ -23,6 +23,7 @@ module Payola
         s.quantity = params[:quantity]
         s.trial_end = params[:trial_end]
         s.tax_percent = params[:tax_percent]
+        s.metadata = params[:metadata] if params[:metadata].present?
         s.stripe_customer_id = customer.id if customer
 
         s.owner = owner
