@@ -10,6 +10,7 @@ module Payola
         sub.prorate = should_prorate?(subscription, plan, coupon_code)
         sub.coupon = coupon_code if coupon_code.present?
         sub.quantity = quantity
+        sub.billing_cycle_anchor = 'now'
         sub.save
 
         subscription.plan = plan
