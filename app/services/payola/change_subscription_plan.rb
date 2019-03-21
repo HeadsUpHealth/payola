@@ -11,6 +11,7 @@ module Payola
         sub.coupon = coupon_code if coupon_code.present?
         sub.quantity = quantity
         sub.trial_end = trial_end if trial_end.present?
+        sub.billing_cycle_anchor = 'now'
         sub.save
 
         subscription.cancel_at_period_end = false
