@@ -8,7 +8,7 @@ module Payola
         sub = retrieve_subscription_for_customer(subscription, secret_key)
         sub.plan = plan.stripe_id
         sub.prorate = should_prorate?(subscription, plan, coupon_code)
-        sub.coupon = coupon_code if coupon_code.present?
+        sub.coupon = coupon_code
         sub.quantity = quantity
         sub.billing_cycle_anchor = 'now'
         sub.save
