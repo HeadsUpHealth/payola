@@ -1,8 +1,11 @@
 var PayolaOnestepSubscriptionForm = {
     initialize: function() {
-        $('.payola-onestep-subscription-form').on('submit', function() {
-            return PayolaOnestepSubscriptionForm.handleSubmit($(this));
-        });
+        $(document).off('submit.payola-onestep-subscription-form').on(
+            'submit.payola-onestep-subscription-form', '.payola-onestep-subscription-form',
+            function() {
+                return PayolaOnestepSubscriptionForm.handleSubmit($(this));
+            }
+        );
     },
 
     handleSubmit: function(form) {
@@ -24,10 +27,14 @@ var PayolaOnestepSubscriptionForm = {
             PayolaOnestepSubscriptionForm.showError(form, 'The card number is not a valid credit card number.');
             return false;
         }
-
-        var expMonth = $("[data-stripe='exp_month']").val();
-        var expYear = $("[data-stripe='exp_year']").val();
-        if (!Stripe.card.validateExpiry(expMonth, expYear)) {
+        if ($("[data-stripe='exp']").length){
+            var valid = !Stripe.card.validateExpiry($("[data-stripe='exp']").val());
+        }else{
+            var expMonth = $("[data-stripe='exp_month']").val();
+            var expYear = $("[data-stripe='exp_year']").val();
+            var valid = !Stripe.card.validateExpiry(expMonth, expYear);
+        }
+        if (valid) {
             PayolaOnestepSubscriptionForm.showError(form, "Your card's expiration month/year is invalid.");
             return false;
         }
@@ -86,14 +93,16 @@ var PayolaOnestepSubscriptionForm = {
         var errorHandler = function(jqXHR){
             PayolaOnestepSubscriptionForm.showError(form, jQuery.parseJSON(jqXHR.responseText).error);
         };
-
-        $.ajax({
-            type: 'GET',
-            dataType: 'json',
-            url: base_path + '/subscription_status/' + guid,
-            success: handler,
-            error: errorHandler
-        });
+        
+        if (typeof guid != 'undefined') {
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                url: base_path + '/subscription_status/' + guid,
+                success: handler,
+                error: errorHandler
+            });
+        }
     },
 
     showError: function(form, message) {
@@ -117,8 +126,4 @@ var PayolaOnestepSubscriptionForm = {
     }
 };
 
-if ('undefined' !== typeof Turbolinks) {
-    $(document).on('page:change', PayolaOnestepSubscriptionForm.initialize);
-} else {
-    $(document).ready(PayolaOnestepSubscriptionForm.initialize);
-}
+PayolaOnestepSubscriptionForm.initialize();

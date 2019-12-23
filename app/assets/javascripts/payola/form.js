@@ -1,8 +1,11 @@
 var PayolaPaymentForm = {
     initialize: function() {
-        $('.payola-payment-form').on('submit', function() {
-            return PayolaPaymentForm.handleSubmit($(this));
-        });
+        $(document).off('submit.payola-payment-form').on(
+            'submit.payola-payment-form', '.payola-payment-form',
+            function() {
+                return PayolaPaymentForm.handleSubmit($(this));
+            }
+        );
     },
 
     handleSubmit: function(form) {
@@ -23,12 +26,16 @@ var PayolaPaymentForm = {
             var base_path = form.data('payola-base-path');
             var product = form.data('payola-product');
             var permalink = form.data('payola-permalink');
-
+            var currency = form.data('payola-currency');
+            var stripe_customer_id = form.data('stripe_customer_id');
+  
             var data_form = $('<form></form>');
+            data_form.append($('<input type="hidden" name="stripe_customer_id">').val(stripe_customer_id));
+            data_form.append($('<input type="hidden" name="currency">').val(currency));
             data_form.append($('<input type="hidden" name="stripeToken">').val(response.id));
             data_form.append($('<input type="hidden" name="stripeEmail">').val(email));
             data_form.append(PayolaPaymentForm.authenticityTokenInput());
-            
+
             $.ajax({
                 type: "POST",
                 url: base_path + "/buy/" + product + "/" + permalink,
@@ -43,16 +50,26 @@ var PayolaPaymentForm = {
         if (num_retries_left === 0) {
             PayolaPaymentForm.showError(form, "This seems to be taking too long. Please contact support and give them transaction ID: " + guid);
         }
-        $.get(base_path + '/status/' + guid, function(data) {
+
+        var handler = function(data) {
             if (data.status === "finished") {
                 form.append($('<input type="hidden" name="payola_sale_guid"></input>').val(guid));
                 form.append(PayolaPaymentForm.authenticityTokenInput());
                 form.get(0).submit();
-            } else if (data.status === "errored") {
-                PayolaPaymentForm.showError(form, data.error);
             } else {
                 setTimeout(function() { PayolaPaymentForm.poll(form, num_retries_left - 1, guid, base_path); }, 500);
             }
+        };
+        var errorHandler = function(jqXHR) {
+            PayolaPaymentForm.showError(form, jQuery.parseJSON(jqXHR.responseText).error);
+        };
+
+        $.ajax({
+            type: 'GET',
+            dataType: 'json',
+            url: base_path + '/status/' + guid,
+            success: handler,
+            error: errorHandler
         });
     },
 
@@ -74,8 +91,4 @@ var PayolaPaymentForm = {
     }
 };
 
-if ('undefined' !== typeof Turbolinks) {
-    $(document).on('page:change', PayolaPaymentForm.initialize);
-} else {
-    $(document).ready(PayolaPaymentForm.initialize);
-}
+PayolaPaymentForm.initialize();

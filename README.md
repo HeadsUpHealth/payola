@@ -1,6 +1,7 @@
 # Payola
 
-[![Gem Version](https://badge.fury.io/rb/payola-payments.svg)](http://badge.fury.io/rb/payola-payments) [![CircleCI](https://circleci.com/gh/peterkeen/payola.svg?style=shield)](https://circleci.com/gh/peterkeen/payola) [![Code Climate](https://codeclimate.com/github/peterkeen/payola/badges/gpa.svg)](https://codeclimate.com/github/peterkeen/payola) [![Test Coverage](https://codeclimate.com/github/peterkeen/payola/badges/coverage.svg)](https://codeclimate.com/github/peterkeen/payola) [![Dependency Status](https://gemnasium.com/peterkeen/payola.svg)](https://gemnasium.com/peterkeen/payola)
+[![Gem Version](https://badge.fury.io/rb/payola-payments.svg)](http://badge.fury.io/rb/payola-payments) [![CircleCI](https://circleci.com/gh/payolapayments/payola.svg?style=shield)](https://circleci.com/gh/payolapayments/payola) [![Code Climate](https://codeclimate.com/github/payolapayments/payola/badges/gpa.svg)](https://codeclimate.com/github/payolapayments/payola) [![Test Coverage](https://codeclimate.com/github/payolapayments/payola/badges/coverage.svg)](https://codeclimate.com/github/payolapayments/payola) [![Dependency Status](https://gemnasium.com/badges/github.com/payolapayments/payola.svg)](https://gemnasium.com/github.com/payolapayments/payola)
+
 
 Payments with Stripe for your Rails application.
 
@@ -39,18 +40,14 @@ Optionally, tell Stripe about your application. Add this as a webhook in your [S
 https://your.website.example.com/payola/events
 ```
 
-### Disable Turbolinks
-
-Payola does not currently play nice with turbolinks. Disable it by removing the turbolinks include in your `application.js`.
-
 ## Additional Setup Resources
 
 
-[One-time payments](https://github.com/peterkeen/payola/wiki/One-time-payments)
+[One-time payments](https://github.com/payolapayments/payola/wiki/One-time-payments)
 
-[Configuration options](https://github.com/peterkeen/payola/wiki/Configuration-options)
+[Configuration options](https://github.com/payolapayments/payola/wiki/Configuration-options)
 
-[Subscriptions](https://github.com/peterkeen/payola/wiki/Subscriptions)
+[Subscriptions](https://github.com/payolapayments/payola/wiki/Subscriptions)
 
 ## TODO
 
@@ -61,6 +58,7 @@ Payola does not currently play nice with turbolinks. Disable it by removing the 
 ## License
 
 Please see the LICENSE file for licensing details.
+
 
 ## Changelog
 

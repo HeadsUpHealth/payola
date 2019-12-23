@@ -12,14 +12,15 @@ Gem::Specification.new do |s|
   s.description = "One-off and subscription payments for your Rails application"
   s.license     = "LGPL-3.0"
 
-  s.files = Dir["{app,config,db,lib}/**/*", "LICENSE", "Rakefile", "README.md", "CHANGELOG.md"]
-  s.test_files = Dir["spec/**/*"]
+  s.files         = `git ls-files -z`.split("\x0").reject do |f|
+    f.match(%r{^(test|spec|features)/})
+  end
 
   s.add_dependency "rails", ">= 4.1"
   s.add_dependency "jquery-rails"
-  s.add_dependency "stripe", ">= 1.20.1"
+  s.add_dependency "stripe", ">= 2.8"
   s.add_dependency "aasm", ">= 4.0.7"
-  s.add_dependency "stripe_event", ">= 1.3.0"
+  s.add_dependency "stripe_event", ">= 2.0.0"
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "rspec-rails"

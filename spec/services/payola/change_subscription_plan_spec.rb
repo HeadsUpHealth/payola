@@ -9,8 +9,8 @@ module Payola
         @plan1 = create(:subscription_plan)
         @plan2 = create(:subscription_plan)
 
-        token = StripeMock.generate_card_token({})
-        @subscription = create(:subscription, plan: @plan1, stripe_token: token)
+        @token = StripeMock.generate_card_token({})
+        @subscription = create(:subscription, plan: @plan1, stripe_token: @token)
         StartSubscription.call(@subscription)
       end
 
@@ -26,6 +26,38 @@ module Payola
 
         it "should change the plan on the payola subscription" do
           expect(@subscription.reload.plan).to eq @plan2
+        end
+      end
+
+      context "trial_end" do
+        before do
+          @sub = Stripe::Subscription.new
+
+          allow(@sub).to receive(:save).and_return(true) # trial_end value is wiped when save is called
+          allow(ChangeSubscriptionPlan).to receive(:retrieve_subscription_for_customer).and_return(@sub)
+        end
+
+        context "not set" do
+          before do
+            Payola::ChangeSubscriptionPlan.call(@subscription, @plan2)
+          end
+
+          it "should not have trial_end set" do
+            expect(@sub.try(:trial_end)).to be_nil
+          end
+        end
+
+        context "set" do
+          before do
+            @quantity = 1
+            @coupon = nil
+            @trial_end = "now"
+            Payola::ChangeSubscriptionPlan.call(@subscription, @plan2, @quantity, @coupon, @trial_end)
+          end
+
+          it "should have the trial_end" do
+            expect(@sub.trial_end).to eq(@trial_end)
+          end
         end
       end
 
@@ -56,6 +88,30 @@ module Payola
 
           it "should have the coupon" do
             expect(@sub.coupon.code).to eq(@coupon.code)
+          end
+        end
+      end
+
+      context "subscription.cancel_at_period_end" do
+        context "not set" do
+          before do
+            Payola::ChangeSubscriptionPlan.call(@subscription, @plan2)
+          end
+
+          it "should not change" do
+            expect(@subscription.cancel_at_period_end).to be false
+          end
+        end
+
+        context "set" do
+          before do
+            @subscription = create(:subscription, plan: @plan1, stripe_token: @token, cancel_at_period_end: true)
+            StartSubscription.call(@subscription)
+            Payola::ChangeSubscriptionPlan.call(@subscription, @plan2)
+          end
+
+          it "should be reset to false" do
+            expect(@subscription.cancel_at_period_end).to be false
           end
         end
       end
